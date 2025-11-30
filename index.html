@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+body{
+  background:;
+  font-family:"Poppins",sans-serif;
+  color:#d1fcce;
+  padding:20px;
+  margin:0;
+  background:#adb8cf;
+  
+}
+
+.head{
+   background:rgba(254,241,100,0.51);
+    margin:18px;
+    padding:22px;
+    border-radius:20px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.12);
+    display:grid;
+    gap:1px;
+    font-family: Sans-Serif;
+    text-align: center;
+    border:2px solid #00eaff;
+}
+
+.click{
+  background:rgba(255,255,255,0.55);
+    margin:18px;
+    padding:22px;
+    border-radius:20px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.12);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    font-family: Sans-Serif;
+    text-align: center;
+    margin-left: 10px;
+}
+h2{
+  text-align:center;
+  margin-bottom:20px;
+  color:#ff3366;
+  letter-spacing:1px;
+  font-weight:700;
+  border-radius: 10px;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  max-width:500px;
+  margin:auto;
+}
+
+button{
+  padding:12px 28px;
+  background:#000;
+  color:#00eaff;
+  border:2px solid #00eaff;
+  border-radius:10px;
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:0 0 10px #00eaff;
+  transition:.3s;
+  font-weight: 900px;
+}
+button:hover{
+  background:#00eaff;
+  color:#000;
+  box-shadow:0 0 18px #00eaff;
+}
+.logout{
+  background:#ff2e2e !important;
+  border-color:#ff2e2e !important;
+}
+.logout:hover{
+  background:#ff1f1f !important;
+  box-shadow:0 0 12px rgba(255,50,50,0.4);
+}
+
+</style>
+</head>
+
+<body>
+<div class="head">
+<h2>⚡ Admin Panel</h2>
+</div>
+<div class="menu">
+
+   <div class=click>
+     <button onclick="go('Control.html')">💵 Control </button>
+     <button onclick="go('List.html')">👥 List</button>
+    </div>
+  
+    <div class=click>
+    <button onclick="go('')"> 💎 Package Control</button>
+    <button onclick="go('')">🛒Orders</button>
+    </div>
+    <div class=click>
+  <button onclick="go('')">🏠 Home Control</button>
+  <button onclick="go('')">📩 Support control</button>
+  </div>
+  <div class=click>
+  <button onclick="go('')">⚙️ Admin Settings</button>
+  </div>
+  <button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+// ---------- ADMIN CHECK ----------
+
+
+// ---------- PAGE CHANGE ----------
+function go(page){
+  window.location.href = page;
+}
+
+// ---------- LOGOUT ----------
+function logout(){
+  localStorage.removeItem("admin");
+  window.location.href = "admin_login.html";
+}
+</script>
+
+</body>
+</html>
