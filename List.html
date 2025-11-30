@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Accepted Players</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+    body{
+        background:#0d0d0d;
+        color:white;
+        font-family:Poppins, sans-serif;
+        padding:15px;
+    }
+    h2{
+        text-align:center;
+        margin-bottom:20px;
+    }
+    .card{
+        background:#1c1c1c;
+        padding:15px;
+        margin:12px 0;
+        border-radius:10px;
+    }
+    .card img{
+        width:90px;
+        height:90px;
+        border-radius:10px;
+        object-fit:cover;
+        margin-bottom:10px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Accepted Players</h2>
+<div id="list"></div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBl0PIm4lvZea96Bte3KaKQJvurGE1P8Es",
+        authDomain: "noreply@post-c7e41.firebaseapp.com",
+        databaseURL: "https://post-c7e41-default-rtdb.firebaseio.com",
+        projectId: "post-c7e41",
+        storageBucket: "post-c7e41.appspot.com",
+        messagingSenderId: "758133068153",
+        appId: "1:758133068153:web:28ef27e45d8037e0d49fa8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Load accepted users only
+    db.ref("players").on("value", snap => {
+        let data = snap.val();
+        let box = document.getElementById("list");
+        box.innerHTML = "";
+
+        for(let id in data){
+            let p = data[id];
+
+            if(p.status === "accepted"){   // Only accepted list
+                box.innerHTML += `
+                    <div class="card">
+                        <img src="${p.logo}">
+                        <div><b>UID:</b> ${p.uid}</div>
+                        <div><b>Nickname:</b> ${p.nickname}</div>
+                        <div><b>IGN:</b> ${p.ign}</div>
+                        <div><b>WhatsApp:</b> ${p.whatsapp}</div>
+                        <div><b>Status:</b> Accepted</div>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
