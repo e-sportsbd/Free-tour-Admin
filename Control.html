@@ -2,108 +2,131 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel</title>
+<title>Free Fire Submit</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <style>
-    body{
-        background:#0d0d0d;
-        color:white;
-        font-family:Poppins, sans-serif;
-        padding:15px;
-    }
-    h2{
-        text-align:center;
-        margin-bottom:15px;
-    }
+  body{
+    background:#0f0f0f;
+    font-family:Poppins, sans-serif;
+    color:white;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+  }
 
-    .box{
-        max-width:450px;
-        margin:auto;
-        background:#1c1c1c;
-        padding:20px;
-        border-radius:10px;
-        margin-bottom:25px;
-    }
+  /* Banner */
+  .banner{
+    width:100%;
+    max-width:420px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:20px;
+  }
 
-    input{
-        width:100%;
-        padding:12px;
-        margin:10px 0;
-        border:none;
-        border-radius:6px;
-        background:#2d2d2d;
-        color:white;
-        font-size:16px;
-    }
+  #bannerImage{
+    width:100%;
+    max-width:420px;
+    border-radius:20px;
+    display:block;
+  }
 
-    button{
-        width:100%;
-        padding:12px;
-        margin:8px 0;
-        background:#ff0057;
-        border:none;
-        border-radius:6px;
-        color:white;
-        font-size:18px;
-        cursor:pointer;
-    }
+  /* Info Box */
+  .topBox{
+    max-width:420px;
+    width:100%;
+    margin:auto;
+    background:#1c1c1c;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    text-align:center;
+  }
 
-    /* Player List */
-    .card{
-        background:#202020;
-        padding:12px;
-        border-radius:8px;
-        margin:12px 0;
-    }
+  .info{
+    margin:8px 0;
+    background:#252525;
+    padding:10px;
+    border-radius:6px;
+    font-size:16px;
+  }
 
-    .card img{
-        width:90px;
-        height:90px;
-        border-radius:10px;
-        object-fit:cover;
-        margin-bottom:10px;
-    }
+  /* Form Box */
+  .box{
+    max-width:420px;
+    width:100%;
+    background:#1c1c1c;
+    padding:20px;
+    border-radius:10px;
+  }
 
-    .btnSmall{
-        width:48%;
-        padding:10px;
-        font-size:15px;
-        border:none;
-        border-radius:6px;
-        cursor:pointer;
-        margin-top:8px;
-    }
-    .del{
-        background:#ff0033;
-        color:white;
-    }
-    .ok{
-        background:#00c853;
-        color:white;
-    }
+  .box h2{
+    text-align:center;
+    margin-bottom:15px;
+  }
+
+  input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:6px;
+    background:#2d2d2d;
+    color:white;
+    font-size:16px;
+  }
+
+  input[type="file"]{
+    background:none;
+  }
+
+  button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    background:#ff0057;
+    color:white;
+    font-size:18px;
+    margin-top:10px;
+    cursor:pointer;
+  }
 </style>
 </head>
 
 <body>
 
-<!-- SLOT CONTROL -->
-<div class="box">
-    <h2>Admin Panel</h2>
-
-    <label>Total Slots:</label>
-    <input type="number" id="slotInput" placeholder="Enter total slots">
-
-    <button onclick="updateSlots()">Update Slots</button>
+<!-- BANNER -->
+<div class="banner">
+ <img id="bannerImage" src="banner.png">
 </div>
 
-<!-- PLAYER LIST -->
+<!-- TOP INFO -->
+<div class="topBox">
+  <div class="info">📅 Custom Date: <span id="today"></span></div>
+  <div class="info">🎯 Total Slots: <span id="totalSlots">0</span></div>
+  <div class="info">📌 Total Submissions: <span id="filled">0</span></div>
+  <div class="info">Available Slots: <span id="empty">0</span></div>
+</div>
+
+<!-- SUBMIT FORM -->
 <div class="box">
-    <h2>All Submissions</h2>
-    <div id="players"></div>
+  <h2>Free Fire Info Submit</h2>
+
+  <input type="text" id="uid" placeholder="Free Fire UID">
+  <input type="text" id="nickname" placeholder="Nickname">
+  <input type="text" id="ign" placeholder="In-game Name">
+  <input type="text" id="whatsapp" placeholder="WhatsApp Number">
+
+  <input type="file" id="logo">
+
+  <button onclick="submitData()">Submit</button>
 </div>
 
 <script>
@@ -120,64 +143,88 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // Load existing slot value
+  // LOAD BANNER
+  db.ref("settings/banner").on("value", snap => {
+    let banner = snap.val();
+    if(banner){
+      document.getElementById("bannerImage").src = banner;
+    }
+  });
+
+  // LOAD CUSTOM DATE
+  db.ref("settings/customDate").on("value", snap => {
+    let date = snap.val() || "Not Set";
+    document.getElementById("today").innerText = date;
+  });
+
+  let totalSlots = 0;
+
+  // Load total slots
   db.ref("settings/totalSlots").on("value", snap => {
-      document.getElementById("slotInput").value = snap.val();
+    totalSlots = snap.val() || 0;
+    document.getElementById("totalSlots").innerText = totalSlots;
+    updateSlots();
   });
 
-  // Update Slots
-  function updateSlots(){
-      const val = document.getElementById("slotInput").value;
-
-      if(val === ""){
-          alert("Enter slot number!");
-          return;
-      }
-
-      db.ref("settings").update({
-          totalSlots: Number(val)
-      });
-
-      alert("Slots updated!");
-  }
-
-  // Load all players
+  // Count total players
   db.ref("players").on("value", snap => {
-      let data = snap.val();
-      let box = document.getElementById("players");
-
-      box.innerHTML = "";
-
-      for(let id in data){
-          let p = data[id];
-
-          box.innerHTML += `
-            <div class="card">
-                <img src="${p.logo}">
-                <div><b>UID:</b> ${p.uid}</div>
-                <div><b>Nickname:</b> ${p.nickname}</div>
-                <div><b>IGN:</b> ${p.ign}</div>
-                <div><b>WhatsApp:</b> ${p.whatsapp}</div>
-
-                <button class="btnSmall ok" onclick="accept('${p.uid}')">Accept</button>
-                <button class="btnSmall del" onclick="remove('${p.uid}')">Delete</button>
-            </div>
-          `;
-      }
+    let filled = snap.numChildren();
+    document.getElementById("filled").innerText = filled;
+    updateSlots();
   });
 
-  // Accept player
-  function accept(uid){
-      db.ref("players/"+uid).update({
-          status: "accepted"
-      });
-      alert("Accepted!");
+  // Update empty slots
+  function updateSlots(){
+    const filled = Number(document.getElementById("filled").innerText) || 0;
+    let empty = totalSlots - filled;
+    if(empty < 0) empty = 0;
+    document.getElementById("empty").innerText = empty;
   }
 
-  // Delete player
-  function remove(uid){
-      db.ref("players/"+uid).remove();
-      alert("Deleted!");
+  // ImgBB API Key
+  const imgbbKey = "88c0bb1467edb4dd6b6c09ab38af1a35";
+
+  function submitData(){
+    const uid = document.getElementById("uid").value.trim();
+    const nickname = document.getElementById("nickname").value.trim();
+    const ign = document.getElementById("ign").value.trim();
+    const whatsapp = document.getElementById("whatsapp").value.trim();
+    const file = document.getElementById("logo").files[0];
+
+    if(!uid || !nickname || !ign || !whatsapp || !file){
+        alert("All fields are required!");
+        return;
+    }
+
+    let form = new FormData();
+    form.append("image", file);
+
+    // Upload image
+    fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
+        method: "POST",
+        body: form
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(!data.success){
+            alert("Image upload failed!");
+            return;
+        }
+
+        let imageURL = data.data.url;
+
+        // Save to Firebase
+        db.ref("players/" + uid).set({
+            uid: uid,
+            nickname: nickname,
+            ign: ign,
+            whatsapp: whatsapp,
+            logo: imageURL
+        });
+
+        alert("Submitted Successfully!");
+    })
+    .catch(() => alert("Something went wrong!"));
   }
 </script>
 
